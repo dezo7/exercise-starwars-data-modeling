@@ -7,26 +7,48 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+class Usuario(Base):
+    __tablename__ = 'usuarios'
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    nombre = Column(String)
+    apellido = Column(String)
+    email = Column(String, unique=True)
+    password = Column(String)
 
-    def to_dict(self):
-        return {}
+    favoritos = relationship("Favorito", back_populates="usuario")
+
+class Planeta(Base):
+    __tablename__ = 'planetas'
+
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String)
+    diametro = Column(Integer)
+    clima = Column(String)
+
+    favoritos = relationship("Favorito", back_populates="planeta")
+
+class Personaje(Base):
+    __tablename__ = 'personajes'
+
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String)
+    especie = Column(String)
+    genero = Column(String)
+
+    favoritos = relationship("Favorito", back_populates="personaje")
+
+class Favorito(Base):
+    __tablename__ = 'favoritos'
+
+    id = Column(Integer, primary_key=True)
+    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    planeta_id = Column(Integer, ForeignKey('planetas.id'))
+    personaje_id = Column(Integer, ForeignKey('personajes.id'))
+
+    usuario = relationship("Usuario", back_populates="favoritos")
+    planeta = relationship("Planeta", back_populates="favoritos")
+    personaje = relationship("Personaje", back_populates="favoritos")
 
 ## Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
